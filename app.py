@@ -1,14 +1,12 @@
 from flask import Flask
 from flask import render_template, request, redirect
 from flask_sqlalchemy import SQLAlchemy
+from flask_login import UserMixin, LoginManager, login_user, logout_user, login_required
+from werkzeug.security import generate_password_hash, check_password_hash
+from flask_bootstrap import Bootstrap
 from datetime import datetime
 import pytz
-from flask_login import UserMixin, LoginManager, login_user, logout_user, login_required
 import os
-
-from werkzeug.security import generate_password_hash, check_password_hash
-
-from flask_bootstrap import Bootstrap
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///blog.db'
@@ -35,14 +33,6 @@ class User(UserMixin, db.Model):
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
-
-
-@app.route('/', methods = ['GET', 'POST'])
-@login_required
-def index():
-    if request.method == 'GET':
-        posts = Post.query.all()
-        return render_template('index.html', posts = posts)
     
     
 @app.route('/signup', methods = ['GET', 'POST'])
@@ -74,6 +64,14 @@ def login():
         
     else:
         return render_template('login.html')
+    
+    
+@app.route('/', methods = ['GET', 'POST'])
+@login_required
+def index():
+    if request.method == 'GET':
+        posts = Post.query.all()
+        return render_template('index.html', posts = posts)
     
 @app.route('/logout')
 @login_required
