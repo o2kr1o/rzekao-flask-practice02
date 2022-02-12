@@ -33,9 +33,9 @@ class User(UserMixin, db.Model):
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
-    
-    
-@app.route('/signup', methods = ['GET', 'POST'])
+
+
+@app.route('/', methods = ['GET', 'POST'])
 def sinup():
     if request.method == 'POST':
         username = request.form.get('username')
@@ -60,18 +60,19 @@ def login():
         user = User.query.filter_by(username = username).first()
         if check_password_hash(user.password, password):
             login_user(user)
-            return redirect('/')
+            return redirect('/toppage')
         
     else:
         return render_template('login.html')
     
     
-@app.route('/', methods = ['GET', 'POST'])
+@app.route('/toppage', methods = ['GET', 'POST'])
 @login_required
-def index():
+def toppage():
     if request.method == 'GET':
         posts = Post.query.all()
         return render_template('index.html', posts = posts)
+    
     
 @app.route('/logout')
 @login_required
@@ -92,7 +93,7 @@ def create():
         db.session.add(post)
         db.session.commit()
         
-        return redirect('/')
+        return redirect('/toppage')
         
     else:
         return render_template('create.html')
@@ -111,7 +112,7 @@ def update(id):
         
         db.session.commit()
         
-        return redirect('/')
+        return redirect('/toppage')
 
 @app.route('/<int:id>/delete', methods = ['GET'])
 @login_required
@@ -121,7 +122,7 @@ def delete(id):
     db.session.delete(post)
     db.session.commit()
         
-    return redirect('/')
+    return redirect('/toppage')
     
 
 if __name__ == '__main__':
